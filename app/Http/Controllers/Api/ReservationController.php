@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\ProcessReservationPayment;
+use App\Models\Media;
 
 class ReservationController extends Controller
 {
@@ -36,7 +37,7 @@ class ReservationController extends Controller
 
         $days = $dates->count();
 
-        $pricePerDay = \App\Models\Media::find($validated['media_id'])->price_per_day ?? 0;
+        $pricePerDay = Media::find($validated['media_id'])->price_per_day ?? 0;
 
         $total = $days * $pricePerDay;
 
@@ -59,7 +60,7 @@ class ReservationController extends Controller
             dispatch((new ProcessReservationPayment($reservation))->delay(now()->addSeconds(3)));
         });
 
-        return response()->json(['message' => 'Reserva creada con éxito', 'total' => $total]);
+        return response()->json(['message' => 'Reserva creada con éxito. Procesando el pago...','total' => $total]);
     }
 
     public function history(Request $request)
